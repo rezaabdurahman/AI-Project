@@ -6,11 +6,11 @@ interface Config {
   readonly NODE_ENV: string;
   readonly PORT: number;
   readonly LOG_LEVEL: string;
-  readonly DATABASE_URL?: string;
-  readonly OPENAI_API_KEY?: string;
-  readonly AWS_ACCESS_KEY_ID?: string;
-  readonly AWS_SECRET_ACCESS_KEY?: string;
-  readonly REDIS_URL?: string;
+  readonly DATABASE_URL?: string | undefined;
+  readonly OPENAI_API_KEY?: string | undefined;
+  readonly AWS_ACCESS_KEY_ID?: string | undefined;
+  readonly AWS_SECRET_ACCESS_KEY?: string | undefined;
+  readonly REDIS_URL?: string | undefined;
 }
 
 function getEnvVar(name: string, defaultValue?: string): string {

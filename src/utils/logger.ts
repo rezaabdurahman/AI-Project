@@ -13,7 +13,7 @@ class Logger {
   private logLevel: LogLevel;
 
   constructor() {
-    const level = process.env.LOG_LEVEL?.toUpperCase() || 'INFO';
+    const level = process.env['LOG_LEVEL']?.toUpperCase() || 'INFO';
     this.logLevel = LogLevel[level as keyof typeof LogLevel] ?? LogLevel.INFO;
   }
 
