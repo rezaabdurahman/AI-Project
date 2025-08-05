@@ -1,0 +1,67 @@
+name: Branch Protection
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  check-staging-status:
+    runs-on: ubuntu-latest
+    if: github.base_ref == 'main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Check if staging branch exists and is ahead
+      run: |
+        # Check if staging branch exists
+        if ! git show-ref --verify --quiet refs/remotes/origin/staging; then
+          echo "❌ Staging branch does not exist. Please create staging branch first."
+          exit 1
+        fi
+        
+        # Check if the PR head is merged into staging
+        PR_HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+        
+        # Check if this commit exists in staging branch
+        if ! git merge-base --is-ancestor $PR_HEAD_SHA origin/staging; then
+          echo "❌ This PR has not been tested in staging branch."
+          echo "Please merge this PR to staging first and ensure all tests pass."
+          exit 1
+        fi
+        
+        echo "✅ This PR has been tested in staging branch and is ready for main."
+    
+    - name: Verify staging CI status
+      uses: actions/github-script@v7
+      with:
+        script: |
+          // Get the latest commit from staging branch
+          const { data: stagingBranch } = await github.rest.repos.getBranch({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            branch: 'staging'
+          });
+          
+          // Get the check runs for the staging branch HEAD
+          const { data: checkRuns } = await github.rest.checks.listForRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: stagingBranch.commit.sha
+          });
+          
+          // Check if all required checks passed
+          const failedChecks = checkRuns.check_runs.filter(check => 
+            check.conclusion !== 'success' && check.conclusion !== 'skipped'
+          );
+          
+          if (failedChecks.length > 0) {
+            core.setFailed(`❌ Staging branch has failing checks: ${failedChecks.map(c => c.name).join(', ')}`);
+            return;
+          }
+          
+          console.log('✅ All checks passed on staging branch');

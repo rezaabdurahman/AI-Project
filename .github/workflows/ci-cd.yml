@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, staging ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, staging ]
 
 env:
   NODE_VERSION: '18.19.0'
@@ -89,7 +89,7 @@ jobs:
   deploy-staging:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/staging'
     environment: staging
     
     steps:
@@ -97,6 +97,7 @@ jobs:
       run: |
         echo "Deploying to staging environment"
         # Add your staging deployment commands here
+        echo "Staging deployment completed successfully"
 
   deploy-production:
     needs: build
