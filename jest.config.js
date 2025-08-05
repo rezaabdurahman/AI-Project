@@ -23,5 +23,6 @@ module.exports = {
     },
   },
   verbose: true,
+  setupFiles: ['dotenv/config'],
   setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.ts'],
 };

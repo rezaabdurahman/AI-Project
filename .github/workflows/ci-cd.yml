@@ -7,15 +7,12 @@ on:
     branches: [ main ]
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '18.19.0'
   PYTHON_VERSION: '3.11'
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [16, 18, 20]
     
     steps:
     - name: Checkout code
@@ -24,7 +21,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
     
     - name: Install dependencies
@@ -37,7 +34,7 @@ jobs:
       run: npm run type-check
     
     - name: Run tests with coverage
-      run: npm run test:coverage
+      run: npm test
     
     - name: Upload coverage reports
       uses: codecov/codecov-action@v3

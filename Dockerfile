@@ -1,4 +1,5 @@
-FROM node:18-alpine
+ARG NODE_VERSION=18
+FROM node:${NODE_VERSION}-alpine
 
 WORKDIR /usr/src/app
 
@@ -10,4 +11,4 @@ COPY . .
 
 RUN npm run build
 
-CMD [ "node", "dist/main.js" ]
+CMD [ "node", "dist/index.js" ]
